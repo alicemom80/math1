@@ -107,7 +107,7 @@ describe('게임 흐름', () => {
     expect(onProgress).toHaveBeenCalledTimes(1);
   });
 
-  test('첫 오답은 "다시 세어 볼까?"만, 두 번째 오답에서 같이 세기 힌트를 준다', async () => {
+  test('첫 오답은 "다시 해 볼까?"만, 두 번째 오답에서 같이 세기 힌트를 준다', async () => {
     const { run, fx, hint } = setup();
     run.start();
     expect(await run.answer(false)).toBe('retry');
@@ -136,7 +136,7 @@ describe('게임 흐름', () => {
     expect(await run.answer(true)).toBe('right');
   });
 
-  test('첫 오답 직후 연타는 무시해서 "다시 세어 볼까?" 기회를 지킨다', async () => {
+  test('첫 오답 직후 연타는 무시해서 "다시 해 볼까?" 기회를 지킨다', async () => {
     const { run, hint, fx } = setup();
     run.start();
     await run.answer(false);
@@ -204,6 +204,28 @@ describe('게임 흐름', () => {
     expect(fx.bubble).toHaveBeenLastCalledWith(IDLE_TEXT, true);
     vi.advanceTimersByTime(IDLE_REMIND_MS * 3);
     expect(fx.bubble.mock.calls.filter(([t]) => t === IDLE_TEXT)).toHaveLength(1);
+  });
+
+  test('긴 문제는 읽기가 끝난 뒤부터 8초를 잰다 (알림이 문제를 끊지 않게)', async () => {
+    let finishPrompt;
+    const fx = {
+      say: vi.fn(),
+      bubble: vi.fn((text) => (text === '아주 긴 이야기 문제' ? new Promise((r) => (finishPrompt = r)) : undefined)),
+      cheer: vi.fn(),
+      sfx: { yes: vi.fn(), boing: vi.fn() },
+    };
+    const ask = () => ({ n: 1, prompt: '아주 긴 이야기 문제', hint: async () => {} });
+    const run = createGameRun({ levels: LEVELS, fx, ask });
+    run.start();
+    vi.advanceTimersByTime(IDLE_REMIND_MS * 2); // 아직 읽는 중
+    expect(fx.bubble).not.toHaveBeenCalledWith(IDLE_TEXT, true);
+
+    finishPrompt();
+    await Promise.resolve();
+    vi.advanceTimersByTime(IDLE_REMIND_MS - 1);
+    expect(fx.bubble).not.toHaveBeenCalledWith(IDLE_TEXT, true);
+    vi.advanceTimersByTime(1);
+    expect(fx.bubble).toHaveBeenLastCalledWith(IDLE_TEXT, true);
   });
 
   test('무언가를 누르면 8초를 처음부터 다시 잰다', () => {
