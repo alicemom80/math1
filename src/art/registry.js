@@ -30,7 +30,7 @@ const PROPS = [
   'fish', 'shell', 'star',
 ];
 // 그려 둔 소품 (webp). 나머지 소품은 svg를 쓴다.
-const DRAWN_PROPS = ['fish', 'shell'];
+const DRAWN_PROPS = ['bush', 'fish', 'shell'];
 // 그려 둔 아이콘·배경 (webp)
 const DRAWN_ICONS = ['settings', 'speaker', 'star'];
 const DRAWN_BACKGROUNDS = BACKGROUNDS; // 배경은 모두 그림

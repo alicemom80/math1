@@ -773,17 +773,17 @@
   flex: 1;
   width: 100%;
   display: flex;
-  align-items: flex-end;
+  align-items: center; /* 숫자와 풍선을 화면 가운데에 */
   justify-content: center;
   gap: 14cqh; /* 풍선이 2.5배로 커져도 숫자와 겹치지 않게 */
-  padding-bottom: 1cqh;
 }
 .balloon.blow {
   width: 13cqh;
   height: 18cqh;
   animation: none; /* 커지는 풍선은 떠다니지 않게 (누르기 쉽게) */
   scale: var(--s);
-  transform-origin: 50% 100%;
+  margin: 0; /* 풍선 터뜨리기용 위 여백을 빼서 숫자와 같은 높이에 */
+  transform-origin: 50% 50%; /* 가운데에서 위아래로 함께 커진다 */
   transition: scale 0.18s ease-out;
 }
 .balloon.blow.puff .bfloat {
@@ -798,11 +798,11 @@
   display: flex;
   align-items: center;
   gap: 3cqh;
-  padding: 1cqh 3cqh;
-  margin-bottom: 1cqh;
-  border-radius: 3cqh;
-  background: rgb(255 255 255 / 85%);
-  border: 0.4cqh solid var(--ink);
+  padding: 1.6cqh 3cqh;
+  margin-bottom: 2cqh;
+  border-radius: 4cqh;
+  background: rgb(255 255 255 / 92%);
+  border: 0.6cqh solid var(--ink);
 }
 .blownum {
   font-weight: 400;
@@ -816,14 +816,15 @@
 .bslots {
   display: flex;
   flex-wrap: wrap;
-  gap: 1cqh;
-  max-width: 54cqh;
+  justify-content: center;
+  gap: 1.6cqh;
+  max-width: 100cqh; /* 칸 10개도 한 줄에 */
 }
 .bslot {
-  width: 4.4cqh;
-  height: 4.4cqh;
+  width: 8cqh;
+  height: 8cqh;
   border-radius: 50%;
-  border: 0.4cqh solid var(--ink);
+  border: 0.6cqh solid var(--ink);
   background: #fff;
 }
 .bslot.on {

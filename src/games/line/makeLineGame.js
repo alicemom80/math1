@@ -3,6 +3,7 @@
 // 틀림은 없다: 길에서 벗어나면 선이 멈춰 기다리고, 손을 떼면 그 끝에서 이어 그을 수 있다.
 // 한동안 가만있으면 노란 점이 길을 한 번 따라가며 보여 준다.
 import { pickHandler, replayClass } from '@공통/games/widgets.js';
+import { DRAW_PRAISE } from '@공통/games/logic.js';
 import { artUrl } from '../../art/registry.js';
 import { buildPath, pointAt, startTrace, pressTrace, moveTrace, releaseTrace, isDone } from '../lineTrace.js';
 import { VIEW, LINE_ICON as ICON, pickPath, toleranceFor } from '../linePaths.js';
@@ -54,6 +55,7 @@ export function makeLineGame({ key, background, kind, traveler, goal, prompt, co
   return {
     key,
     background,
+    praise: DRAW_PRAISE,
     levels: [
       [0, 0],
       [1, 1],
@@ -118,7 +120,7 @@ export function makeLineGame({ key, background, kind, traveler, goal, prompt, co
         idleTimer = setTimeout(() => {
           if (!alive() || run.state.busy || trace.active) return;
           demos += 1;
-          bubble(LINE_IDLE_HINT, true);
+          if (demos > 1) bubble(LINE_IDLE_HINT, true); // 첫 안내는 말 없이 점만 (방금 들은 설명과 겹치거나 끊지 않게)
           const from = trace.reached;
           const began = Date.now();
           hintDot.classList.add('on');

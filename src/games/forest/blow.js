@@ -6,10 +6,12 @@ import { pickHandler, replayClass } from '@공통/games/widgets.js';
 import { blowScale, nextPress, isBlown } from '../blowLogic.js';
 import { BALLOON_COLORS, PIECE_COLORS, popBalloon } from '../balloonFx.js';
 import { blowPrompt, BLOW_HINT } from '../../audio/villageScript.js';
+import { COUNT_PRAISE } from '@공통/games/logic.js';
 
 const IDLE_HINT_MS = 5000; // 이만큼 안 누르면 눌러 보라고 알려 준다
 
 export const blowGame = {
+  praise: COUNT_PRAISE,
   key: 'blow',
   background: 'forest-base',
   levels: [

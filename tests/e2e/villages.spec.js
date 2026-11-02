@@ -154,8 +154,9 @@ test('선 긋기: 엉뚱한 곳은 안내만, 중간에 떼도 이어 긋고, �
 
   // 다음 문제에서 가만있으면 노란 점이 길을 따라가며 보여 준다
   await expect(page.locator('.play .right')).toHaveCount(0, { timeout: 5000 });
+  // 첫 안내는 말 없이 점만 (방금 들은 문제 설명과 겹치지 않게)
   await expect(page.locator('.play .lhint.on')).toBeVisible({ timeout: 8000 });
-  await expect(page.locator('.bubble')).toContainText('끝까지 따라가 봐');
+  await expect(page.locator('.bubble')).not.toContainText('끝까지 따라가 봐');
 });
 
 test('숲속 마을 게임 3개를 다 끝내면 바닷가 마을이 열린다', async ({ page }) => {

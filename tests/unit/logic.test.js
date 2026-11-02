@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import { NATIVE, ADJ, PRAISE, DICE, nearChoices, pickNumber, tenFrame, shuffle } from '@공통/games/logic.js';
+import { NATIVE, ADJ, PRAISE, GENERAL_PRAISE, COUNT_PRAISE, PICK_PRAISE, DRAW_PRAISE, DICE, nearChoices, pickNumber, tenFrame, shuffle } from '@공통/games/logic.js';
 
 // 정해진 순서로 값을 돌려주는 가짜 Math.random
 const seq = (...values) => {
@@ -17,6 +17,20 @@ describe('말 목록', () => {
   test('칭찬에는 과정 칭찬이 섞여 있다', () => {
     expect(PRAISE.length).toBeGreaterThanOrEqual(4);
     expect(PRAISE.some((p) => p.includes('끝까지'))).toBe(true);
+  });
+
+  test('세기·고르기·그리기 칭찬은 게임에 맞는 말만 쓴다', () => {
+    const counts = (p) => /세었|셌|세어/.test(p);
+    const picks = (p) => /골랐/.test(p);
+    const draws = (p) => /그렸|그어/.test(p);
+    expect(PICK_PRAISE.some(counts) || PICK_PRAISE.some(draws)).toBe(false);
+    expect(DRAW_PRAISE.some(counts) || DRAW_PRAISE.some(picks)).toBe(false);
+    expect(COUNT_PRAISE.some(picks) || COUNT_PRAISE.some(draws)).toBe(false);
+    expect(GENERAL_PRAISE.some((p) => counts(p) || picks(p) || draws(p))).toBe(false);
+  });
+
+  test('모든 칭찬 목록은 녹음 목록(PRAISE) 안의 말이다', () => {
+    [...GENERAL_PRAISE, ...COUNT_PRAISE, ...PICK_PRAISE, ...DRAW_PRAISE].forEach((p) => expect(PRAISE).toContain(p));
   });
 });
 

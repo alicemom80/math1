@@ -1,5 +1,6 @@
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
-import { createGameRun, NEXT_DELAY_MS, IDLE_REMIND_MS, RETRY_LOCK_MS, RETRY_TEXT, IDLE_TEXT } from '@공통/games/engine.js';
+import { createGameRun, NEXT_DELAY_MS, PRAISE_MAX_MS, IDLE_REMIND_MS, RETRY_LOCK_MS, RETRY_TEXT, IDLE_TEXT } from '@공통/games/engine.js';
+import { GENERAL_PRAISE } from '@공통/games/logic.js';
 
 const LEVELS = [
   [1, 3],
@@ -53,6 +54,48 @@ describe('게임 흐름', () => {
     run.start();
     await run.answer(true);
     expect(fx.say).toHaveBeenCalledWith('우와, 맞았어!');
+  });
+
+  test('칭찬 목록을 주지 않으면 어느 게임에나 맞는 칭찬만 한다', async () => {
+    const { run, fx } = setup();
+    run.start();
+    await run.answer(true);
+    expect(GENERAL_PRAISE).toContain(fx.say.mock.calls.at(-1)[0]);
+  });
+
+  test('칭찬이 길면 칭찬이 끝난 뒤에 다음 문제로 간다', async () => {
+    let endPraise;
+    const { run, fx, asked } = setup();
+    fx.say.mockImplementation(() => new Promise((resolve) => (endPraise = resolve)));
+    run.start();
+    await run.answer(true);
+    await vi.advanceTimersByTimeAsync(NEXT_DELAY_MS + 500);
+    expect(asked).toHaveLength(1); // 아직 칭찬 중
+    endPraise();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(asked).toHaveLength(2);
+  });
+
+  test('칭찬이 끝나지 않아도 최대 시간이 지나면 다음 문제로 간다', async () => {
+    const { run, fx, asked } = setup();
+    fx.say.mockImplementation(() => new Promise(() => {}));
+    run.start();
+    await run.answer(true);
+    await vi.advanceTimersByTimeAsync(PRAISE_MAX_MS - 1);
+    expect(asked).toHaveLength(1);
+    await vi.advanceTimersByTimeAsync(1);
+    expect(asked).toHaveLength(2);
+  });
+
+  test('칭찬이 짧아도 1.6초는 기다린다', async () => {
+    const { run, fx, asked } = setup();
+    fx.say.mockImplementation(() => Promise.resolve());
+    run.start();
+    await run.answer(true);
+    await vi.advanceTimersByTimeAsync(NEXT_DELAY_MS - 1);
+    expect(asked).toHaveLength(1);
+    await vi.advanceTimersByTimeAsync(1);
+    expect(asked).toHaveLength(2);
   });
 
   test('정답 효과가 끝나기 전 다시 누르면 무시한다', async () => {
